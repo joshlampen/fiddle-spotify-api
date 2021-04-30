@@ -7,6 +7,7 @@ const (
 	URLSpotifyUserPlaylists = "https://api.spotify.com/v1/me/playlists"
 	URLSpotifyPlaylists = "https://api.spotify.com/v1/playlists"
 	URLSpotifyArtists = "https://api.spotify.com/v1/artists"
+    URLSpotifyPlayTrack = "https://api.spotify.com/v1/me/player/play"
 )
 
 const (

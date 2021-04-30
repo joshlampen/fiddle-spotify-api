@@ -22,6 +22,7 @@ func main() {
 	r.HandleFunc("/users", handler.GetUser).Methods("GET", "OPTIONS")
 	r.HandleFunc("/playlists", handler.GetPlaylists).Methods("GET", "OPTIONS")
 	r.HandleFunc("/tracks/get", handler.GetTracks).Methods("PUT", "OPTIONS")
+	r.HandleFunc("/player", handler.PlayTrack).Methods("GET", "OPTIONS")
 
 	http.ListenAndServe(":" + port, r)
 }
