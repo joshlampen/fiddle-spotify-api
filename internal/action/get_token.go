@@ -12,6 +12,7 @@ import (
 
 	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/model"
+	"github.com/JoshLampen/fiddle/spotify-api/internal/utils/format"
 )
 
 // GetToken is an action for getting an access token from Spotify
@@ -93,7 +94,7 @@ func (a *GetToken) Save(ctx context.Context) error {
 		return fmt.Errorf("GetToken - failed to marshal request body: %w", err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, constant.URLAPIToken, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest(http.MethodPost, format.Url(constant.URLAPIToken), bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return fmt.Errorf("GetToken - could not create post request: %w", err)
 	}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/model"
+	"github.com/JoshLampen/fiddle/spotify-api/internal/utils/format"
 )
 
 // GetPlaylists is an action for getting a user's profile from Spotify
@@ -41,7 +42,7 @@ func NewGetPlaylists(authID, userID, spotifyUserID string) GetPlaylists {
 // Fetch the data needed to process the request
 func (a *GetPlaylists) Fetch(ctx context.Context) error {
     // Construct request to get access token
-	req, err := http.NewRequest(http.MethodGet, constant.URLAPIToken, nil)
+	req, err := http.NewRequest(http.MethodGet, format.Url(constant.URLAPIToken), nil)
 	if err != nil {
 		return fmt.Errorf("GetPlaylists - could not create get token request: %w", err)
 	}
@@ -115,7 +116,7 @@ func (a *GetPlaylists) Save(ctx context.Context) error {
 		return fmt.Errorf("GetPlaylists - failed to marshal post playlists request body: %w", err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, constant.URLAPIPlaylists, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest(http.MethodPost, format.Url(constant.URLAPIPlaylists), bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return fmt.Errorf("GetPlaylists - could not create post playlists request: %w", err)
 	}

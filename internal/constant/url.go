@@ -11,8 +11,8 @@ const (
 )
 
 const (
-    URLAPIToken = "http://localhost:8001/tokens"
-	URLAPIUsers = "http://localhost:8001/users"
-	URLAPIPlaylists = "http://localhost:8001/playlists"
-	URLAPITracks = "http://localhost:8001/tracks"
+    URLAPIToken = "/tokens"
+	URLAPIUsers = "/users"
+	URLAPIPlaylists = "/playlists"
+	URLAPITracks = "/tracks"
 )

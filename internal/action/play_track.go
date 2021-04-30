@@ -9,6 +9,7 @@ import (
 
 	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/model"
+	"github.com/JoshLampen/fiddle/spotify-api/internal/utils/format"
 )
 
 // PlayTrack is an action for getting a user's profile from Spotify
@@ -36,7 +37,7 @@ func NewPlayTrack(authID, deviceID, spotifyURI string) PlayTrack {
 // Fetch the data needed to process the request
 func (a *PlayTrack) Fetch(ctx context.Context) error {
     // Construct request to get access token
-	req, err := http.NewRequest(http.MethodGet, constant.URLAPIToken, nil)
+	req, err := http.NewRequest(http.MethodGet, format.Url(constant.URLAPIToken), nil)
 	if err != nil {
 		return err
 	}
