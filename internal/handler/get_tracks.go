@@ -9,6 +9,7 @@ import (
 	"github.com/JoshLampen/fiddle/spotify-api/internal/action"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/model"
 	actionRunner "github.com/JoshLampen/fiddle/spotify-api/internal/utils/action"
+	jsonWriter "github.com/JoshLampen/fiddle/spotify-api/internal/utils/json"
 )
 
 // GetTracks is an HTTP handler for getting a playlist's tracks from Spotify
@@ -21,7 +22,8 @@ func GetTracks(w http.ResponseWriter, r *http.Request) {
     // Read the request
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-        fmt.Println("handler.GetTracks - failed to read request body:", err)
+        err := fmt.Errorf("Failed to read request: %w", err)
+        jsonWriter.WriteError(w, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -40,18 +42,12 @@ func GetTracks(w http.ResponseWriter, r *http.Request) {
 			playlist.TotalTracks,
 		)
 		if err := actionRunner.Run(r.Context(), &tracks); err != nil {
-			fmt.Println("handler.GetTracks - failed to execute GetTracks action:", err)
+            jsonWriter.WriteError(w, err, http.StatusInternalServerError)
 			return
 		}
 
         respBody.Items = append(respBody.Items, tracks.DBResponse.Items...)
 	}
 
-    // Send a response
-	jsonBody, err := json.Marshal(respBody)
-	if err != nil {
-		fmt.Println("handler.GetTracks - failed to marshal response body:", err)
-		return
-	}
-	w.Write(jsonBody)
+    jsonWriter.WriteResponse(w, respBody)
 }

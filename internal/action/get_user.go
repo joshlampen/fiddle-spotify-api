@@ -106,7 +106,7 @@ func (a *GetUser) Execute(ctx context.Context) error {
 // Save the output to the database
 func (a *GetUser) Save(ctx context.Context) error {
 	// Construct the request
-	reqBody := model.MapCreateUserRequest(a.Token, a.SpotifyResponse)
+	reqBody := model.MapCreateUserRequest(a.AuthID, a.Token, a.SpotifyResponse)
 	jsonBody, err := json.Marshal(reqBody)
 	if err != nil {
 		return fmt.Errorf("GetUser - failed to marshal post user request body: %w", err)

@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
 
 	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
+	jsonWriter "github.com/JoshLampen/fiddle/spotify-api/internal/utils/json"
 )
 
 var authID string
@@ -17,13 +17,6 @@ var authID string
 // ConnectToSpotify is an HTTP handler for connecting to Spotify
 func ConnectToSpotify(w http.ResponseWriter, r *http.Request) {
 	// Get environment variables
-	port := os.Getenv("PORT")
-	if port == "" {
-		// If port is not defined, load local env file
-		if err := godotenv.Load(constant.DotEnvFilePath); err != nil {
-			fmt.Println("handler.ConnectToSpotify - failed to load .env file:", err)
-		}
-	}
 	clientID := os.Getenv(constant.EnvVarClientID)
 	redirectUrl := os.Getenv(constant.EnvVarRedirectURL)
 
@@ -47,7 +40,8 @@ func ConnectToSpotify(w http.ResponseWriter, r *http.Request) {
 	// Create state token to protect against cross-site request forgery
 	uuid, err := uuid.NewRandom()
 	if err != nil {
-		fmt.Println("handler.ConnectToSpotify - failed to generate uuid:", err)
+        err := fmt.Errorf("Failed to generate uuid: %w", err)
+		jsonWriter.WriteError(w, err, http.StatusInternalServerError)
 	}
 	csrf := uuid.String()
 

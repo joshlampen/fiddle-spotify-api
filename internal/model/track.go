@@ -42,6 +42,7 @@ type SpotifyTrackExternalURL struct {
 // DBTracks is the request body for creating a user's tracks in the database
 type DBTracks struct {
     AuthID string `json:"auth_id"`
+    PlaylistID string `json:"playlist_id"`
 	Items []DBTrack `json:"items"`
 }
 
@@ -57,12 +58,12 @@ type DBTrack struct {
 	SpotifyID string `json:"spotify_id"`
     Artists types.JSONText `json:"artists"`
     Album types.JSONText `json:"album"`
-	PlaylistID string `json:"playlist_id"`
 }
 
 // MapCreateTracksRequest maps a Spotify playlist tracks response to a core API tracks request
 func MapCreateTracksRequest(playlistID string, items []SpotifyPlaylistItem, artists map[string]SpotifyArtist) (DBTracks, error) {
 	var request DBTracks
+    request.PlaylistID = playlistID
 
 	for _, item := range items {
 		var reqItem DBTrack
@@ -73,7 +74,6 @@ func MapCreateTracksRequest(playlistID string, items []SpotifyPlaylistItem, arti
         reqItem.SpotifyURI = item.Track.URI
 		reqItem.SpotifyURL = item.Track.ExternalURLs.Spotify
 		reqItem.SpotifyID = item.Track.ID
-		reqItem.PlaylistID = playlistID
 
         mappedArtists, err := mapArtists(item.Track.Artists)
         if err != nil {

@@ -5,11 +5,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/joho/godotenv"
-
 	"github.com/JoshLampen/fiddle/spotify-api/internal/action"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
 	actionRunner "github.com/JoshLampen/fiddle/spotify-api/internal/utils/action"
+	jsonWriter "github.com/JoshLampen/fiddle/spotify-api/internal/utils/json"
 )
 
 const grantTypeAuthCode = "authorization_code"
@@ -27,14 +26,6 @@ const popupWindowSuccessHTML = `
 
 // GetToken is an HTTP handler for getting a user's access token from Spotify
 func GetToken(w http.ResponseWriter, r *http.Request) {
-    // Get environment variables
-	port := os.Getenv("PORT")
-	if port == "" {
-		// If port is not defined, load local env file
-		if err := godotenv.Load(constant.DotEnvFilePath); err != nil {
-			fmt.Println("handler.ConnectToSpotify - failed to load .env file:", err)
-		}
-	}
 	clientID := os.Getenv(constant.EnvVarClientID)
 	clientSecret := os.Getenv(constant.EnvVarClientSecret)
 	redirectUrl := os.Getenv(constant.EnvVarRedirectURL)
@@ -55,11 +46,11 @@ func GetToken(w http.ResponseWriter, r *http.Request) {
 		redirectUrl,
 	)
 	if err := actionRunner.Run(r.Context(), &token); err != nil {
-		fmt.Println("handler.GetToken - failed to execute GetToken action:", err)
+		jsonWriter.WriteError(w, err, http.StatusInternalServerError)
 		return
 	}
 
     if _, err := fmt.Fprint(w, popupWindowSuccessHTML); err != nil {
-		fmt.Println("handler.GetAuthCode - failed to write html:", err)
+		jsonWriter.WriteError(w, err, http.StatusInternalServerError)
 	}
 }

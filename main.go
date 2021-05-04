@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 
+	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/handler"
 )
 
@@ -13,6 +16,10 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000" // localhost
+        // If port is not defined, load local env file
+		if err := godotenv.Load(constant.DotEnvFilePath); err != nil {
+			panic(fmt.Errorf("failed to load .env file: %w", err))
+		}
 	}
 
 	r := mux.NewRouter()

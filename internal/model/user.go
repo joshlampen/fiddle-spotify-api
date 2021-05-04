@@ -27,17 +27,19 @@ type DBUser struct {
 	SpotifyURL string `json:"spotify_url"`
 	SpotifyImageURL string `json:"spotify_image_url"`
 	SpotifyID string `json:"spotify_id"`
+    AuthID string `json:"auth_id"`
     Token string `json:"token"`
 }
 
 // MapCreateUserRequest maps a Spotify user response to a core API user request
-func MapCreateUserRequest(token string, profile SpotifyUser) DBUser {
+func MapCreateUserRequest(authID, token string, profile SpotifyUser) DBUser {
 	var request DBUser
 	request.DisplayName = profile.DisplayName
 	request.Email = profile.Email
 	request.SpotifyURL = profile.ExternalURLs.Spotify
 	request.SpotifyImageURL = profile.Images[0].URL
 	request.SpotifyID = profile.ID
+	request.AuthID = authID
     request.Token = token
 
 	return request
