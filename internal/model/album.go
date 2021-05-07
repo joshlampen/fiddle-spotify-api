@@ -8,9 +8,9 @@ import (
 
 // SpotifyAlbum is the album for a SpotifyPlaylistItem
 type SpotifyAlbum struct {
-    Name string `json:"name"`
+    Name         string                  `json:"name"`
     ExternalURLs SpotifyAlbumExternalURL `json:"external_urls"`
-    Images []SpotifyAlbumImage `json:"images"`
+    Images       []SpotifyAlbumImage     `json:"images"`
 }
 
 // SpotifyAlbumExternalURL contains the url for the album on Spotify
@@ -25,8 +25,8 @@ type SpotifyAlbumImage struct {
 
 // DBAlbum is a representation of an album in the database
 type DBAlbum struct {
-    Name string `json:"name"`
-    SpotifyURL string `json:"spotify_url"`
+    Name            string `json:"name"`
+    SpotifyURL      string `json:"spotify_url"`
     SpotifyImageURL string `json:"spotify_image_url"`
 }
 

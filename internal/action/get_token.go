@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -13,6 +12,7 @@ import (
 	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/model"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/utils/format"
+	"github.com/JoshLampen/fiddle/spotify-api/internal/utils/logger"
 )
 
 // GetToken is an action for getting an access token from Spotify
@@ -50,6 +50,8 @@ func (a *GetToken) Fetch(ctx context.Context) error {
 
 // Execute the request
 func (a *GetToken) Execute(ctx context.Context) error {
+    logger := logger.NewLogger()
+
 	// Construct the request
 	data := url.Values{}
 	data.Set("client_id", a.ClientID)
@@ -60,25 +62,41 @@ func (a *GetToken) Execute(ctx context.Context) error {
 
 	req, err := http.NewRequest(http.MethodPost, constant.URLSpotifyToken, strings.NewReader(data.Encode()))
 	if err != nil {
-		return fmt.Errorf("GetToken - could not create request: %w", err)
+        logger.Error().
+            Err(err).
+            Str("authID", a.AuthID).
+            Msg("action.GetToken - failed to create get token request")
+		return err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	// Do the request
 	resp, err := a.Client.Do(req)
 	if err != nil {
-		return fmt.Errorf("GetToken - request failed: %w", err)
+        logger.Error().
+            Err(err).
+            Str("authID", a.AuthID).
+            Msg("action.GetToken - get token request failed")
+		return err
 	}
 	defer resp.Body.Close()
 
 	// Read the response
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("GetToken - failed to read response body: %w", err)
+        logger.Error().
+            Err(err).
+            Str("authID", a.AuthID).
+            Msg("action.GetToken - failed to read get token response body")
+		return err
 	}
 	var jsonResp model.Token
 	if err := json.Unmarshal(body, &jsonResp); err != nil {
-		return fmt.Errorf("GetToken - failed to unmarshal response body: %w", err)
+        logger.Error().
+            Err(err).
+            Str("authID", a.AuthID).
+            Msg("action.GetToken - failed to unmarshal get token response body")
+		return err
 	}
 
 	a.Response = jsonResp
@@ -87,23 +105,37 @@ func (a *GetToken) Execute(ctx context.Context) error {
 
 // Save the output to the database
 func (a *GetToken) Save(ctx context.Context) error {
+    logger := logger.NewLogger()
+
     // Construct the request
     reqBody := model.MapCreateTokenRequest(a.AuthID, a.Response)
 	jsonBody, err := json.Marshal(reqBody)
 	if err != nil {
-		return fmt.Errorf("GetToken - failed to marshal request body: %w", err)
+        logger.Error().
+            Err(err).
+            Str("authID", a.AuthID).
+            Msg("action.GetToken - failed to marshal post token request body")
+		return err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, format.Url(constant.URLAPIToken), bytes.NewBuffer(jsonBody))
 	if err != nil {
-		return fmt.Errorf("GetToken - could not create post request: %w", err)
+        logger.Error().
+            Err(err).
+            Str("authID", a.AuthID).
+            Msg("action.GetToken - failed to create post token request")
+		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	// Do the request
 	_, err = a.Client.Do(req)
 	if err != nil {
-		return fmt.Errorf("GetToken - post request failed: %w", err)
+        logger.Error().
+            Err(err).
+            Str("authID", a.AuthID).
+            Msg("action.GetToken - post token request failed")
+		return err
 	}
 
 	return nil

@@ -40,8 +40,12 @@ func ConnectToSpotify(w http.ResponseWriter, r *http.Request) {
 	// Create state token to protect against cross-site request forgery
 	uuid, err := uuid.NewRandom()
 	if err != nil {
-        err := fmt.Errorf("Failed to generate uuid: %w", err)
-		jsonWriter.WriteError(w, err, http.StatusInternalServerError)
+		jsonWriter.WriteError(
+            w,
+            fmt.Errorf("Failed to generate uuid: %w", err),
+            http.StatusInternalServerError,
+        )
+        return
 	}
 	csrf := uuid.String()
 

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -12,6 +11,7 @@ import (
 	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/model"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/utils/format"
+	"github.com/JoshLampen/fiddle/spotify-api/internal/utils/logger"
 )
 
 // GetTracks is an action for getting a playlist's tracks from Spotify
@@ -45,10 +45,16 @@ func NewGetTracks(authID, playlistID, spotifyPlaylistID string, totalTracks int)
 
 // Fetch the data needed to process the request
 func (a *GetTracks) Fetch(ctx context.Context) error {
+    logger := logger.NewLogger()
+
     // Construct request to get access token
 	req, err := http.NewRequest(http.MethodGet, format.Url(constant.URLAPIToken), nil)
 	if err != nil {
-		return fmt.Errorf("GetTracks - could not create get token request: %w", err)
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - failed to create get token request")
+		return err
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
@@ -60,18 +66,30 @@ func (a *GetTracks) Fetch(ctx context.Context) error {
 	// Do the request
 	resp, err := a.Client.Do(req)
 	if err != nil {
-		return fmt.Errorf("GetTracks - get token request failed: %w", err)
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - get token request failed")
+		return err
 	}
 
 	// Read the response
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("GetTracks - failed to read get token response: %w", err)
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - failed to read get token response")
+		return err
 	}
 
 	var token model.Token
 	if err := json.Unmarshal(body, &token); err != nil {
-		return fmt.Errorf("GetTracks - failed to unmarshal get token response: %w", err)
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - failed to unmarshal get token response")
+		return err
 	}
 
 	a.Token = token.AccessToken
@@ -80,50 +98,82 @@ func (a *GetTracks) Fetch(ctx context.Context) error {
 
 // Execute the request
 func (a *GetTracks) Execute(ctx context.Context) error {
+    logger := logger.NewLogger()
+
     if err := getTracks(a); err != nil {
-        return fmt.Errorf("GetTracks - failed to run getTracks")
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - failed to run getTracks")
+		return err
     }
-    if err := getTrackArtists(a); err != nil {
-        return fmt.Errorf("GetTracks - failed to run getTrackArtists")
-    }
+    // if err := getTrackArtists(a); err != nil {
+    //     return fmt.Errorf("GetTracks - failed to run getTrackArtists")
+    // }
 
 	return nil
 }
 
 // Save the output to the database
 func (a *GetTracks) Save(ctx context.Context) error {
+    logger := logger.NewLogger()
+
 	// Construct the request
 	reqBody, err := model.MapCreateTracksRequest(a.PlaylistID, a.SpotifyTracksResponse.Items, a.SpotifyArtistsResponse)
     if err != nil {
-        return fmt.Errorf("GetTracks - failed to map create tracks request: %w", err)
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - failed to map post tracks request")
+		return err
     }
 
 	jsonBody, err := json.Marshal(reqBody)
 	if err != nil {
-		return fmt.Errorf("GetTracks - failed to marshal post tracks request body: %w", err)
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - failed to marshal post tracks request body")
+		return err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, format.Url(constant.URLAPITracks), bytes.NewBuffer(jsonBody))
 	if err != nil {
-		return fmt.Errorf("GetTracks - could not post tracks request: %w", err)
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - failed to create post tracks request")
+		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	// Do the request
 	resp, err := a.Client.Do(req)
 	if err != nil {
-		return fmt.Errorf("GetTracks - post tracks request failed: %w", err)
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - post tracks request failed")
+		return err
 	}
 
     // Read the response
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("GetTracks - failed to read post tracks response: %w", err)
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - failed to read post tracks response")
+		return err
 	}
 
     var tracks model.DBTracks
 	if err := json.Unmarshal(body, &tracks); err != nil {
-		return fmt.Errorf("GetTracks - failed to unmarshal post tracks response: %w", err)
+        logger.Error().
+            Err(err).
+            Str("playlistID", a.PlaylistID).
+            Msg("action.GetTracks - failed to unmarshal post tracks response")
+		return err
 	}
 
 	a.DBResponse = tracks
@@ -145,7 +195,7 @@ func getTracks(a *GetTracks) error {
 		// Construct the request
 		req, err := http.NewRequest(http.MethodGet, constant.URLSpotifyPlaylists + "/" + a.SpotifyPlaylistID + "/tracks", nil)
 		if err != nil {
-			return fmt.Errorf("GetTracks - could not create get tracks request: %w", err)
+			return err
 		}
 		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", "application/json")
@@ -159,19 +209,19 @@ func getTracks(a *GetTracks) error {
 		// Do the request
 		resp, err := a.Client.Do(req)
 		if err != nil {
-			return fmt.Errorf("GetTracks - get tracks request failed: %w", err)
+			return err
 		}
 		defer resp.Body.Close()
 
 		// Read the response
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("GetTracks - failed to read get tracks response body: %w", err)
+			return err
 		}
 
 		var jsonResp model.SpotifyPlaylistTracks
 		if err := json.Unmarshal(body, &jsonResp); err != nil {
-			return fmt.Errorf("GetTracks - failed to unmarshal get tracks response body: %w", err)
+			return err
 		}
 
 		if len(a.SpotifyTracksResponse.Items) == 0 {
@@ -187,7 +237,7 @@ func getTracks(a *GetTracks) error {
     return nil
 }
 
-func getTrackArtists(a *GetTracks) error {
+// func getTrackArtists(a *GetTracks) error {
     // // Spotify accepts max 50 artists at a time
 	// // Construct requests until all artists have been requested
 	// artistIDs := model.MapGetArtistsRequest(a.SpotifyTracksResponse.Items)
@@ -240,5 +290,5 @@ func getTrackArtists(a *GetTracks) error {
 	// 	}
 	// }
 
-	return nil
-}
+	// return nil
+// }

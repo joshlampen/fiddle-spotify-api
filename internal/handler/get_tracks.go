@@ -22,8 +22,11 @@ func GetTracks(w http.ResponseWriter, r *http.Request) {
     // Read the request
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-        err := fmt.Errorf("Failed to read request: %w", err)
-        jsonWriter.WriteError(w, err, http.StatusInternalServerError)
+        jsonWriter.WriteError(
+            w,
+            fmt.Errorf("Failed to read get tracks request: %w", err),
+            http.StatusInternalServerError,
+        )
 		return
 	}
 
@@ -42,7 +45,11 @@ func GetTracks(w http.ResponseWriter, r *http.Request) {
 			playlist.TotalTracks,
 		)
 		if err := actionRunner.Run(r.Context(), &tracks); err != nil {
-            jsonWriter.WriteError(w, err, http.StatusInternalServerError)
+            jsonWriter.WriteError(
+                w,
+                fmt.Errorf("Failed to get tracks from Spotify: %w", err),
+                http.StatusInternalServerError,
+            )
 			return
 		}
 

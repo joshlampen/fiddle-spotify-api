@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/JoshLampen/fiddle/spotify-api/internal/action"
@@ -22,7 +23,11 @@ func GetPlaylists(w http.ResponseWriter, r *http.Request) {
 
 	playlists := action.NewGetPlaylists(authID, userID, spotifyUserID)
 	if err := actionRunner.Run(r.Context(), &playlists); err != nil {
-		jsonWriter.WriteError(w, err, http.StatusInternalServerError)
+		jsonWriter.WriteError(
+            w,
+            fmt.Errorf("Failed to get playlists from Spotify: %w", err),
+            http.StatusInternalServerError,
+        )
 		return
 	}
 

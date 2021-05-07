@@ -11,20 +11,20 @@ type SpotifyPlaylistTracks struct {
 
 // SpotifyPlaylistItem is an item within a Spotify playlist
 type SpotifyPlaylistItem struct {
-	Track SpotifyTrack `json:"track"`
-    AddedAt string `json:"added_at"`
+	Track   SpotifyTrack `json:"track"`
+    AddedAt string       `json:"added_at"`
 }
 
 // SpotifyTrack is a track within a SpotifyPlaylistItem
 type SpotifyTrack struct {
-	ID string `json:"id"`
-	Name string `json:"name"`
-	Popularity int `json:"popularity"`
-    Duration int `json:"duration_ms"`
-    URI string `json:"uri"`
+	ID           string                  `json:"id"`
+	Name         string                  `json:"name"`
+	Popularity   int                     `json:"popularity"`
+    Duration     int                     `json:"duration_ms"`
+    URI          string                  `json:"uri"`
 	ExternalURLs SpotifyTrackExternalURL `json:"external_urls"`
-    Artists []SpotifyArtist `json:"artists"`
-    Album SpotifyAlbum `json:"album"`
+    Artists      []SpotifyArtist         `json:"artists"`
+    Album        SpotifyAlbum            `json:"album"`
 
 	// ArtistIDs []SpotifyArtistID `json:"artists"`
 }
@@ -41,23 +41,23 @@ type SpotifyTrackExternalURL struct {
 
 // DBTracks is the request body for creating a user's tracks in the database
 type DBTracks struct {
-    AuthID string `json:"auth_id"`
-    PlaylistID string `json:"playlist_id"`
-	Items []DBTrack `json:"items"`
+    AuthID     string    `json:"auth_id"`
+    PlaylistID string    `json:"playlist_id"`
+	Items      []DBTrack `json:"items"`
 }
 
 // DBTrack is a track within CreateTracksRequest
 type DBTrack struct {
-    ID string `json:"id"`
-	Name string `json:"name"`
-	Popularity int `json:"popularity"`
-    Duration int `json:"duration_ms"`
-    AddedAt string `json:"added_at"`
-    SpotifyURI string `json:"spotify_uri"`
-	SpotifyURL string `json:"spotify_url"`
-	SpotifyID string `json:"spotify_id"`
-    Artists types.JSONText `json:"artists"`
-    Album types.JSONText `json:"album"`
+    ID         string         `json:"id"`
+	Name       string         `json:"name"`
+	Popularity int            `json:"popularity"`
+    Duration   int            `json:"duration_ms"`
+    AddedAt    string         `json:"added_at"`
+    SpotifyURI string         `json:"spotify_uri"`
+	SpotifyURL string         `json:"spotify_url"`
+	SpotifyID  string         `json:"spotify_id"`
+    Artists    types.JSONText `json:"artists"`
+    Album      types.JSONText `json:"album"`
 }
 
 // MapCreateTracksRequest maps a Spotify playlist tracks response to a core API tracks request

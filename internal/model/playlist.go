@@ -7,11 +7,11 @@ type SpotifyPlaylists struct {
 
 // SpotifyPlaylist is a user's Spotify playlist
 type SpotifyPlaylist struct {
-	ID string `json:"id"`
-	Name string `json:"name"`
+	ID           string                     `json:"id"`
+	Name         string                     `json:"name"`
 	ExternalURLs SpotifyPlaylistExternalURL `json:"external_urls"`
-	Owner SpotifyPlaylistOwner `json:"owner"`
-	Tracks SpotifyPlaylistTrackInfo `json:"tracks"`
+	Owner        SpotifyPlaylistOwner       `json:"owner"`
+	Tracks       SpotifyPlaylistTrackInfo   `json:"tracks"`
 }
 
 // SpotifyPlaylistExternalURL contains the url for the user's playlist on Spotify
@@ -31,18 +31,18 @@ type SpotifyPlaylistTrackInfo struct {
 
 // DBPlaylists is the request body for creating a user's playlists in the database
 type DBPlaylists struct {
-    AuthID string `json:"auth_id"`
-	UserID string `json:"user_id"`
-	Items []DBPlaylist `json:"items"`
+    AuthID string       `json:"auth_id"`
+	UserID string       `json:"user_id"`
+	Items  []DBPlaylist `json:"items"`
 }
 
 // DBPlaylist is a playlist within the database
 type DBPlaylist struct {
-	ID string `json:"id"`
-	Name string `json:"name"`
-	SpotifyURL string `json:"spotify_url"`
-	SpotifyID string `json:"spotify_id"`
-	TotalTracks int `json:"total_tracks"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	SpotifyURL  string `json:"spotify_url"`
+	SpotifyID   string `json:"spotify_id"`
+	TotalTracks int    `json:"total_tracks"`
 }
 
 // MapCreatePlaylistsRequest maps a Spotify user playlists response to a core API user playlists request

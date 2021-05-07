@@ -1,12 +1,13 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/JoshLampen/fiddle/spotify-api/internal/action"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
 	actionRunner "github.com/JoshLampen/fiddle/spotify-api/internal/utils/action"
-	json "github.com/JoshLampen/fiddle/spotify-api/internal/utils/json"
+	jsonWriter "github.com/JoshLampen/fiddle/spotify-api/internal/utils/json"
 )
 
 // GetUser is an HTTP handler for getting a user's information from Spotify
@@ -20,9 +21,13 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	user := action.NewGetUser(authID)
 	if err := actionRunner.Run(r.Context(), &user); err != nil {
-		json.WriteError(w, err, http.StatusInternalServerError)
+        jsonWriter.WriteError(
+            w,
+            fmt.Errorf("Failed to get user from Spotify: %w", err),
+            http.StatusInternalServerError,
+        )
 		return
 	}
 
-    json.WriteResponse(w, user.DBResponse)
+    jsonWriter.WriteResponse(w, user.DBResponse)
 }

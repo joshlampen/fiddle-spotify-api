@@ -10,9 +10,12 @@ import (
 
 	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/handler"
+	"github.com/JoshLampen/fiddle/spotify-api/internal/utils/logger"
 )
 
 func main() {
+    logger := logger.NewLogger()
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000" // localhost
@@ -31,5 +34,6 @@ func main() {
 	r.HandleFunc("/tracks/get", handler.GetTracks).Methods("PUT", "OPTIONS")
 	r.HandleFunc("/player", handler.PlayTrack).Methods("GET", "OPTIONS")
 
+    logger.Info().Msgf("Fiddle Spotify API listening on port %s", port)
 	http.ListenAndServe(":" + port, r)
 }

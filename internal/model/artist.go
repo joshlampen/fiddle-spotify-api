@@ -13,8 +13,8 @@ type SpotifyArtists struct {
 
 // SpotifyArtist is an artist from Spotify
 type SpotifyArtist struct {
-	ID string `json:"id"`
-	Name string `json:"name"`
+	ID           string                   `json:"id"`
+	Name         string                   `json:"name"`
     ExternalURLs SpotifyArtistExternalURL `json:"external_urls"`
 
 	// Genres []string `json:"genres"`
@@ -27,7 +27,7 @@ type SpotifyArtistExternalURL struct {
 
 // DBArtist is a representation of an artist in the database
 type DBArtist struct {
-    Name string `json:"name"`
+    Name       string `json:"name"`
     SpotifyURL string `json:"spotify_url"`
     // SpotifyID string `json:"spotify_id"`
 }

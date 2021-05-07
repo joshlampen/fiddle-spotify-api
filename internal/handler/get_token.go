@@ -46,11 +46,20 @@ func GetToken(w http.ResponseWriter, r *http.Request) {
 		redirectUrl,
 	)
 	if err := actionRunner.Run(r.Context(), &token); err != nil {
-		jsonWriter.WriteError(w, err, http.StatusInternalServerError)
+        jsonWriter.WriteError(
+            w,
+            fmt.Errorf("Failed to get token from Spotify: %w", err),
+            http.StatusInternalServerError,
+        )
 		return
 	}
 
     if _, err := fmt.Fprint(w, popupWindowSuccessHTML); err != nil {
-		jsonWriter.WriteError(w, err, http.StatusInternalServerError)
+        jsonWriter.WriteError(
+            w,
+            fmt.Errorf("Failed to write to popup window: %w", err),
+            http.StatusInternalServerError,
+        )
+		return
 	}
 }

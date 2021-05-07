@@ -7,6 +7,7 @@ import (
 	"github.com/JoshLampen/fiddle/spotify-api/internal/action"
 	"github.com/JoshLampen/fiddle/spotify-api/internal/constant"
 	actionRunner "github.com/JoshLampen/fiddle/spotify-api/internal/utils/action"
+	jsonWriter "github.com/JoshLampen/fiddle/spotify-api/internal/utils/json"
 )
 
 // PlayTrack sends a play request to the Spotify player
@@ -22,7 +23,11 @@ func PlayTrack(w http.ResponseWriter, r *http.Request) {
 
 	playTrack := action.NewPlayTrack(authID, deviceID, spotifyURI)
 	if err := actionRunner.Run(r.Context(), &playTrack); err != nil {
-		fmt.Println("handler.PlayTrack - failed to execute PlayTrack action:", err)
+        jsonWriter.WriteError(
+            w,
+            fmt.Errorf("Failed to play track: %w", err),
+            http.StatusInternalServerError,
+        )
 		return
 	}
 

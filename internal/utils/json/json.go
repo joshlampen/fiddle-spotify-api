@@ -2,18 +2,21 @@ package json
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+
+	"github.com/JoshLampen/fiddle/spotify-api/internal/utils/logger"
 )
 
 func WriteResponse(w http.ResponseWriter, resp interface{}) {
+    logger := logger.NewLogger()
+
     w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS")
     w.Header().Set("Access-Control-Allow-Headers", "content-type")
     jsonBody, err := json.Marshal(resp)
 	if err != nil {
-		fmt.Println("json.WriteResponse - failed to marshal response body:", err)
+        logger.Error().Err(err).Msg("json.WriteResponse - failed to marshal response body")
 		return
 	}
     w.Write(jsonBody)
